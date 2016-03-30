@@ -32,7 +32,12 @@ from neutron.common import rpc as q_rpc
 from neutron.db import agents_db
 from neutron.context import get_admin_context
 from neutron.extensions import portbindings
-from neutron.common import log
+try:
+    from neutron.common import log
+except ImportError:
+    from oslo_log import log
+
+
 import f5.oslbaasv1driver.drivers.constants as lbaasv1constants
 
 PREJUNO = False
