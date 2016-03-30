@@ -24,7 +24,7 @@ except ImportError:
         from f5.oslbaasv1agent.drivers.bigip.rpc import RpcProxy  # @Reimport
 from neutron.agent import rpc as agent_rpc
 from neutron.plugins.ml2.drivers.l2pop import rpc as l2pop_rpc
-from neutron.common import log
+from oslo_log import helpers as log_helpers
 
 import logging
 
@@ -51,7 +51,7 @@ class LbaasAgentApi(RpcProxy):
         self.group = group
         self.host = host
 
-    @log.log
+    @log_helpers.log_method_call
     def get_all_pools(self):
         return self.call(
             self.context,
@@ -64,7 +64,7 @@ class LbaasAgentApi(RpcProxy):
             topic=self.topic
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def get_active_pools(self):
         return self.call(
             self.context,
@@ -77,7 +77,7 @@ class LbaasAgentApi(RpcProxy):
             topic=self.topic
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def get_pending_pools(self):
         return self.call(
             self.context,
@@ -90,7 +90,7 @@ class LbaasAgentApi(RpcProxy):
             topic=self.topic
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def get_service_by_pool_id(self, pool_id, global_routed_mode=False):
         return self.call(
             self.context,
@@ -103,7 +103,7 @@ class LbaasAgentApi(RpcProxy):
             topic=self.topic
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def create_port_on_subnet(self, subnet_id=None,
                               mac_address=None, name=None,
                               fixed_address_count=1):
@@ -120,7 +120,7 @@ class LbaasAgentApi(RpcProxy):
             topic=self.topic
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def create_port_on_subnet_with_specific_ip(self, subnet_id=None,
                                                mac_address=None, name=None,
                                                ip_address=None):
@@ -137,7 +137,7 @@ class LbaasAgentApi(RpcProxy):
             topic=self.topic
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def get_port_by_name(self, port_name=None):
         return self.call(
             self.context,
@@ -148,7 +148,7 @@ class LbaasAgentApi(RpcProxy):
             topic=self.topic
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def delete_port(self, port_id=None, mac_address=None):
         return self.call(
             self.context,
@@ -160,7 +160,7 @@ class LbaasAgentApi(RpcProxy):
             topic=self.topic
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def delete_port_by_name(self, port_name=None):
         return self.call(
             self.context,
@@ -171,7 +171,7 @@ class LbaasAgentApi(RpcProxy):
             topic=self.topic
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def get_ports_for_mac_addresses(self, mac_addresses=None):
         return self.call(
             self.context,
@@ -182,7 +182,7 @@ class LbaasAgentApi(RpcProxy):
             topic=self.topic
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def add_allowed_address(self, port_id=None, ip_address=None):
         return self.call(
             self.context,
@@ -194,7 +194,7 @@ class LbaasAgentApi(RpcProxy):
             topic=self.topic
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def remove_allowed_address(self, port_id=None, ip_address=None):
         return self.call(
             self.context,
@@ -206,7 +206,7 @@ class LbaasAgentApi(RpcProxy):
             topic=self.topic
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def allocate_fixed_address_on_subnet(self, subnet_id=None,
                                          port_id=None, name=None,
                                          fixed_address_count=1):
@@ -223,7 +223,7 @@ class LbaasAgentApi(RpcProxy):
             topic=self.topic
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def allocate_specific_fixed_address_on_subnet(self, subnet_id=None,
                                                   port_id=None, name=None,
                                                   ip_address=None):
@@ -240,7 +240,7 @@ class LbaasAgentApi(RpcProxy):
             topic=self.topic
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def deallocate_fixed_address_on_subnet(self,
                                            fixed_addresses=None,
                                            subnet_id=None,
@@ -257,7 +257,7 @@ class LbaasAgentApi(RpcProxy):
             topic=self.topic
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def update_vip_status(self, vip_id=None,
                           status=None, status_description=None):
         return self.call(
@@ -272,7 +272,7 @@ class LbaasAgentApi(RpcProxy):
             topic=self.topic
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def vip_destroyed(self, vip_id=None):
         return self.call(
             self.context,
@@ -280,7 +280,7 @@ class LbaasAgentApi(RpcProxy):
             topic=self.topic
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def update_pool_status(self, pool_id=None,
                            status=None, status_description=None):
         return self.call(
@@ -295,7 +295,7 @@ class LbaasAgentApi(RpcProxy):
             topic=self.topic
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def pool_destroyed(self, pool_id):
         return self.call(
             self.context,
@@ -303,7 +303,7 @@ class LbaasAgentApi(RpcProxy):
             topic=self.topic
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def update_member_status(self, member_id=None,
                              status=None, status_description=None):
         return self.call(
@@ -318,7 +318,7 @@ class LbaasAgentApi(RpcProxy):
             topic=self.topic
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def member_destroyed(self, member_id):
         return self.call(
             self.context,
@@ -327,7 +327,7 @@ class LbaasAgentApi(RpcProxy):
             topic=self.topic
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def update_health_monitor_status(self, pool_id=None,
                                      health_monitor_id=None,
                                      status=None,
@@ -345,7 +345,7 @@ class LbaasAgentApi(RpcProxy):
             topic=self.topic
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def health_monitor_destroyed(self, health_monitor_id=None,
                                  pool_id=None):
         return self.call(
@@ -357,7 +357,7 @@ class LbaasAgentApi(RpcProxy):
             topic=self.topic
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def update_pool_stats(self, pool_id, stats):
         return self.call(
             self.context,

@@ -25,6 +25,8 @@ except ImportError:
 
 from time import time
 
+from oslo_log import helpers as log_helpers
+
 from neutron.api.v2 import attributes
 from neutron.common import constants as q_const
 from neutron.plugins.common import constants
@@ -32,10 +34,9 @@ from neutron.common import rpc as q_rpc
 from neutron.db import agents_db
 from neutron.context import get_admin_context
 from neutron.extensions import portbindings
-try:
-    from neutron.common import log
-except ImportError:
-    from oslo_log import log
+
+
+
 
 
 import f5.oslbaasv1driver.drivers.constants as lbaasv1constants
@@ -129,7 +130,7 @@ class LoadBalancerCallbacks(object):
         """ Get the core plugin """
         return self.plugin._core_plugin
 
-    @log.log
+    @log_helpers.log_method_call
     def get_all_pools(self, context, env=None, group=0, host=None):
         """ Get all pools for this group in this env"""
         with context.session.begin(subtransactions=True):
@@ -161,7 +162,7 @@ class LoadBalancerCallbacks(object):
                     )
             return pool_ids
 
-    @log.log
+    @log_helpers.log_method_call
     def get_active_pools(self, context, env=None, group=0, host=None):
         """ Get pools that are active for this group in this env"""
         with context.session.begin(subtransactions=True):
@@ -195,7 +196,7 @@ class LoadBalancerCallbacks(object):
                         )
             return pool_ids
 
-    @log.log
+    @log_helpers.log_method_call
     def get_pending_pools(self, context, env=None, group=0, host=None):
         """ Get pools that have pending task for this group in this env"""
         with context.session.begin(subtransactions=True):
@@ -277,7 +278,7 @@ class LoadBalancerCallbacks(object):
 
             return pools_to_update
 
-    @log.log
+    @log_helpers.log_method_call
     def get_service_by_pool_id(
             self, context, pool_id=None, global_routed_mode=False, host=None):
         """ Get full service definition from pool id """
@@ -593,7 +594,7 @@ class LoadBalancerCallbacks(object):
         if 'provider:segmentation_id' not in member['network']:
             member['network']['provider:segmentation_id'] = 0
 
-    @log.log
+    @log_helpers.log_method_call
     def create_network(self, context, tenant_id=None, name=None, shared=False,
                        admin_state_up=True, network_type=None,
                        physical_network=None, segmentation_id=None):
@@ -613,12 +614,12 @@ class LoadBalancerCallbacks(object):
         return self._core_plugin().create_network(
             context, {'network': network_data})
 
-    @log.log
+    @log_helpers.log_method_call
     def delete_network(self, context, network_id):
         """ Delete neutron network """
         self._core_plugin().delete_network(context, network_id)
 
-    @log.log
+    @log_helpers.log_method_call
     def create_subnet(self, context, tenant_id=None, network_id=None,
                       name=None, shared=False, cidr=None, enable_dhcp=False,
                       gateway_ip=None, allocation_pools=None,
@@ -643,12 +644,12 @@ class LoadBalancerCallbacks(object):
             {'subenet': subnet_data}
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def delete_subnet(self, context, subnet_id):
         """ Delete neutron subnet """
         self._core_plugin().delete_subnet(context, subnet_id)
 
-    @log.log
+    @log_helpers.log_method_call
     def get_ports_for_mac_addresses(self, context, mac_addresses=None):
         """ Get ports for mac addresses """
         if not isinstance(mac_addresses, list):
@@ -659,7 +660,7 @@ class LoadBalancerCallbacks(object):
             filters=filters
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def get_ports_on_network(self, context, network_id=None):
         """ Get ports for mac addresses """
         if not isinstance(network_id, list):
@@ -670,7 +671,7 @@ class LoadBalancerCallbacks(object):
             filters=filters
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def create_port_on_subnet(self, context, subnet_id=None,
                               mac_address=None, name=None,
                               fixed_address_count=1, host=None):
@@ -716,7 +717,7 @@ class LoadBalancerCallbacks(object):
                 context, port['id'], {'port': update_data})
             return port
 
-    @log.log
+    @log_helpers.log_method_call
     def create_port_on_subnet_with_specific_ip(self, context, subnet_id=None,
                                                mac_address=None, name=None,
                                                ip_address=None, host=None):
@@ -756,7 +757,7 @@ class LoadBalancerCallbacks(object):
                 context, port['id'], {'port': update_data})
             return port
 
-    @log.log
+    @log_helpers.log_method_call
     def get_port_by_name(self, context, port_name=None):
         """ Get port by name """
         if port_name:
@@ -766,7 +767,7 @@ class LoadBalancerCallbacks(object):
                 filters=filters
             )
 
-    @log.log
+    @log_helpers.log_method_call
     def delete_port(self, context, port_id=None, mac_address=None):
         """ Delete port """
         if port_id:
@@ -777,7 +778,7 @@ class LoadBalancerCallbacks(object):
             for port in ports:
                 self._core_plugin().delete_port(context, port['id'])
 
-    @log.log
+    @log_helpers.log_method_call
     def delete_port_by_name(self, context, port_name=None):
         """ Delete port by name """
         if port_name:
@@ -786,7 +787,7 @@ class LoadBalancerCallbacks(object):
             for port in ports:
                 self._core_plugin().delete_port(context, port['id'])
 
-    @log.log
+    @log_helpers.log_method_call
     def allocate_fixed_address_on_subnet(self, context, subnet_id=None,
                                          port_id=None, name=None,
                                          fixed_address_count=1, host=None):
@@ -826,7 +827,7 @@ class LoadBalancerCallbacks(object):
                     port['new_fixed_ips'].append(new_fixed_ip)
             return port
 
-    @log.log
+    @log_helpers.log_method_call
     def allocate_specific_fixed_address_on_subnet(self, context,
                                                   subnet_id=None,
                                                   port_id=None, name=None,
@@ -853,7 +854,7 @@ class LoadBalancerCallbacks(object):
             port = self._core_plugin().update_port(context, {'port': port})
             return port
 
-    @log.log
+    @log_helpers.log_method_call
     def deallocate_fixed_address_on_subnet(self, context, fixed_addresses=None,
                                            subnet_id=None, host=None,
                                            auto_delete_port=False):
@@ -899,7 +900,7 @@ class LoadBalancerCallbacks(object):
                     if ok_to_delete_port[port]:
                         self.delete_port(context, port)
 
-    @log.log
+    @log_helpers.log_method_call
     def add_allowed_address(self, context, port_id=None, ip_address=None):
         """ Add allowed addresss """
         if port_id and ip_address:
@@ -925,7 +926,7 @@ class LoadBalancerCallbacks(object):
                 LOG.error('could not add allowed address pair: %s'
                           % exc.message)
 
-    @log.log
+    @log_helpers.log_method_call
     def remove_allowed_address(self, context, port_id=None, ip_address=None):
         """ Remove allowed addresss """
         if port_id and ip_address:
@@ -945,7 +946,7 @@ class LoadBalancerCallbacks(object):
                 LOG.error('could not add allowed address pair: %s'
                           % exc.message)
 
-    @log.log
+    @log_helpers.log_method_call
     def update_vip_status(self, context, vip_id=None,
                           status=constants.ERROR,
                           status_description=None,
@@ -965,13 +966,13 @@ class LoadBalancerCallbacks(object):
         except VipNotFound:
             pass
 
-    @log.log
+    @log_helpers.log_method_call
     def vip_destroyed(self, context, vip_id=None, host=None):
         """Agent confirmation hook that a pool has been destroyed."""
         # delete the vip from the data model
         self.plugin._delete_db_vip(context, vip_id)
 
-    @log.log
+    @log_helpers.log_method_call
     def update_pool_status(self, context, pool_id=None,
                            status=constants.ERROR, status_description=None,
                            host=None):
@@ -992,13 +993,13 @@ class LoadBalancerCallbacks(object):
         except PoolNotFound:
             pass
 
-    @log.log
+    @log_helpers.log_method_call
     def pool_destroyed(self, context, pool_id=None, host=None):
         """Agent confirmation hook that a pool has been destroyed."""
         # delete the pool from the data model
         self.plugin._delete_db_pool(context, pool_id)
 
-    @log.log
+    @log_helpers.log_method_call
     def update_member_status(self, context, member_id=None,
                              status=constants.ERROR, status_description=None,
                              host=None):
@@ -1017,7 +1018,7 @@ class LoadBalancerCallbacks(object):
         except MemberNotFound:
             pass
 
-    @log.log
+    @log_helpers.log_method_call
     def member_destroyed(self, context, member_id=None, host=None):
         """Agent confirmation hook that a member has been destroyed."""
         # delete the pool member from the data model
@@ -1026,7 +1027,7 @@ class LoadBalancerCallbacks(object):
         except MemberNotFound:
             pass
 
-    @log.log
+    @log_helpers.log_method_call
     def update_health_monitor_status(self, context, pool_id=None,
                                      health_monitor_id=None,
                                      status=constants.ERROR,
@@ -1051,7 +1052,7 @@ class LoadBalancerCallbacks(object):
         except HealthMonitorNotFound:
             pass
 
-    @log.log
+    @log_helpers.log_method_call
     def health_monitor_destroyed(self, context, health_monitor_id=None,
                                  pool_id=None, host=None):
         """Agent confirmation hook that a health has been destroyed."""
@@ -1066,7 +1067,7 @@ class LoadBalancerCallbacks(object):
         except:
             pass
 
-    @log.log
+    @log_helpers.log_method_call
     def update_pool_stats(self, context, pool_id=None, stats=None, host=None):
         """ Update pool stats """
         try:
@@ -1106,7 +1107,7 @@ class LoadBalancerCallbacks(object):
         return q_rpc.PluginRpcDispatcher(  # @UndefinedVariable
             [self, agents_db.AgentExtRpcCallback(self.plugin)])
 
-    @log.log
+    @log_helpers.log_method_call
     def _get_vxlan_endpoints(self, context, host=None):
         """ Get vxlan endpoints """
         endpoints = []
@@ -1184,7 +1185,7 @@ class LoadBalancerAgentApi(proxy.RpcProxy):  # @UndefinedVariable
             super(LoadBalancerAgentApi, self).__init__(
                 topic, default_version=self.BASE_RPC_API_VERSION)
 
-    @log.log
+    @log_helpers.log_method_call
     def create_vip(self, context, vip, service, host):
         """ Send message to agent to create vip """
         return self.cast(
@@ -1193,7 +1194,7 @@ class LoadBalancerAgentApi(proxy.RpcProxy):  # @UndefinedVariable
             topic='%s.%s' % (self.topic, host)
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def update_vip(self, context, old_vip, vip, service, host):
         """ Send message to agent to update vip """
         return self.cast(
@@ -1203,7 +1204,7 @@ class LoadBalancerAgentApi(proxy.RpcProxy):  # @UndefinedVariable
             topic='%s.%s' % (self.topic, host)
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def delete_vip(self, context, vip, service, host):
         """ Send message to agent to create vip """
         return self.cast(
@@ -1212,7 +1213,7 @@ class LoadBalancerAgentApi(proxy.RpcProxy):  # @UndefinedVariable
             topic='%s.%s' % (self.topic, host)
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def create_pool(self, context, pool, service, host):
         """ Send message to agent to create pool """
         return self.cast(
@@ -1221,7 +1222,7 @@ class LoadBalancerAgentApi(proxy.RpcProxy):  # @UndefinedVariable
             topic='%s.%s' % (self.topic, host)
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def update_pool(self, context, old_pool, pool, service, host):
         """ Send message to agent to update pool """
         return self.cast(
@@ -1231,7 +1232,7 @@ class LoadBalancerAgentApi(proxy.RpcProxy):  # @UndefinedVariable
             topic='%s.%s' % (self.topic, host)
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def delete_pool(self, context, pool, service, host):
         """ Send message to agent to delete pool """
         return self.cast(
@@ -1240,7 +1241,7 @@ class LoadBalancerAgentApi(proxy.RpcProxy):  # @UndefinedVariable
             topic='%s.%s' % (self.topic, host)
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def create_member(self, context, member, service, host):
         """ Send message to agent to create member """
         return self.cast(
@@ -1249,7 +1250,7 @@ class LoadBalancerAgentApi(proxy.RpcProxy):  # @UndefinedVariable
             topic='%s.%s' % (self.topic, host)
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def update_member(self, context, old_member, member, service, host):
         """ Send message to agent to update member """
         return self.cast(
@@ -1259,7 +1260,7 @@ class LoadBalancerAgentApi(proxy.RpcProxy):  # @UndefinedVariable
             topic='%s.%s' % (self.topic, host)
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def delete_member(self, context, member, service, host):
         """ Send message to agent to delete member """
         return self.cast(
@@ -1268,7 +1269,7 @@ class LoadBalancerAgentApi(proxy.RpcProxy):  # @UndefinedVariable
             topic='%s.%s' % (self.topic, host)
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def create_pool_health_monitor(self, context, health_monitor, pool,
                                    service, host):
         """ Send message to agent to create pool health monitor """
@@ -1280,7 +1281,7 @@ class LoadBalancerAgentApi(proxy.RpcProxy):  # @UndefinedVariable
             topic='%s.%s' % (self.topic, host)
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def update_health_monitor(self, context, old_health_monitor,
                               health_monitor, pool, service, host):
         """ Send message to agent to update pool health monitor """
@@ -1293,7 +1294,7 @@ class LoadBalancerAgentApi(proxy.RpcProxy):  # @UndefinedVariable
             topic='%s.%s' % (self.topic, host)
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def delete_pool_health_monitor(self, context, health_monitor, pool,
                                    service, host):
         """ Send message to agent to delete pool health monitor """
@@ -1305,7 +1306,7 @@ class LoadBalancerAgentApi(proxy.RpcProxy):  # @UndefinedVariable
             topic='%s.%s' % (self.topic, host)
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def agent_updated(self, context, admin_state_up, host):
         """ Send message to update agent """
         return self.cast(
@@ -1316,7 +1317,7 @@ class LoadBalancerAgentApi(proxy.RpcProxy):  # @UndefinedVariable
             version='1.1'
         )
 
-    @log.log
+    @log_helpers.log_method_call
     def get_pool_stats(self, context, pool, service, host):
         """ Send message to agent to get pool stats """
         LOG.debug('Calling agent for get_pool_stats')
@@ -1422,7 +1423,7 @@ class F5PluginDriver(LoadBalancerAbstractDriver):
             raise lbaas_agentscheduler.NoActiveLbaasAgent(pool_id=pool_id)
         return agent['agent']
 
-    @log.log
+    @log_helpers.log_method_call
     def create_vip(self, context, vip):
         """ Handle LBaaS method by passing to agent """
         # which agent should handle provisioning
@@ -1456,7 +1457,7 @@ class F5PluginDriver(LoadBalancerAbstractDriver):
         # call the RPC proxy with the constructed message
         self.agent_rpc.create_vip(context, vip, service, agent['host'])
 
-    @log.log
+    @log_helpers.log_method_call
     def update_vip(self, context, old_vip, vip):
         """ Handle LBaaS method by passing to agent """
         # which agent should handle provisioning
@@ -1478,7 +1479,7 @@ class F5PluginDriver(LoadBalancerAbstractDriver):
         self.agent_rpc.update_vip(context, old_vip, vip,
                                   service, agent['host'])
 
-    @log.log
+    @log_helpers.log_method_call
     def delete_vip(self, context, vip):
         """ Handle LBaaS method by passing to agent """
         # which agent should handle provisioning
@@ -1497,7 +1498,7 @@ class F5PluginDriver(LoadBalancerAbstractDriver):
         # call the RPC proxy with the constructed message
         self.agent_rpc.delete_vip(context, vip, service, agent['host'])
 
-    @log.log
+    @log_helpers.log_method_call
     def create_pool(self, context, pool):
         """ Handle LBaaS method by passing to agent """
         # which agent should handle provisioning
@@ -1518,7 +1519,7 @@ class F5PluginDriver(LoadBalancerAbstractDriver):
         # call the RPC proxy with the constructed message
         self.agent_rpc.create_pool(context, pool, service, agent['host'])
 
-    @log.log
+    @log_helpers.log_method_call
     def update_pool(self, context, old_pool, pool):
         """ Handle LBaaS method by passing to agent """
         # which agent should handle provisioning
@@ -1541,7 +1542,7 @@ class F5PluginDriver(LoadBalancerAbstractDriver):
         self.agent_rpc.update_pool(context, old_pool, pool,
                                    service, agent['host'])
 
-    @log.log
+    @log_helpers.log_method_call
     def delete_pool(self, context, pool):
         """ Handle LBaaS method by passing to agent """
         # which agent should handle provisioning
@@ -1564,7 +1565,7 @@ class F5PluginDriver(LoadBalancerAbstractDriver):
         # call the RPC proxy with the constructed message
         self.agent_rpc.delete_pool(context, pool, service, agent['host'])
 
-    @log.log
+    @log_helpers.log_method_call
     def create_member(self, context, member):
         """ Handle LBaaS method by passing to agent """
         # which agent should handle provisioning
@@ -1608,7 +1609,7 @@ class F5PluginDriver(LoadBalancerAbstractDriver):
         # call the RPC proxy with the constructed message
         self.agent_rpc.create_member(context, member, service, agent['host'])
 
-    @log.log
+    @log_helpers.log_method_call
     def update_member(self, context, old_member, member):
         """ Handle LBaaS method by passing to agent """
         # which agent should handle provisioning
@@ -1655,7 +1656,7 @@ class F5PluginDriver(LoadBalancerAbstractDriver):
                 old_pool_service, agent['host']
             )
 
-    @log.log
+    @log_helpers.log_method_call
     def delete_member(self, context, member):
         """ Handle LBaaS method by passing to agent """
         # which agent should handle provisioning
@@ -1678,7 +1679,7 @@ class F5PluginDriver(LoadBalancerAbstractDriver):
         self.agent_rpc.delete_member(context, member,
                                      service, agent['host'])
 
-    @log.log
+    @log_helpers.log_method_call
     def create_pool_health_monitor(self, context, health_monitor, pool_id):
         """ Handle LBaaS method by passing to agent """
         # which agent should handle provisioning
@@ -1700,7 +1701,7 @@ class F5PluginDriver(LoadBalancerAbstractDriver):
                                                   pool, service,
                                                   agent['host'])
 
-    @log.log
+    @log_helpers.log_method_call
     def update_pool_health_monitor(self, context, old_health_monitor,
                                    health_monitor, pool_id):
         """ Handle LBaaS method by passing to agent """
@@ -1723,7 +1724,7 @@ class F5PluginDriver(LoadBalancerAbstractDriver):
                                              health_monitor, pool,
                                              service, agent['host'])
 
-    @log.log
+    @log_helpers.log_method_call
     def update_health_monitor(self, context, old_health_monitor,
                               health_monitor, pool_id):
         """ Handle LBaaS method by passing to agent """
@@ -1746,7 +1747,7 @@ class F5PluginDriver(LoadBalancerAbstractDriver):
                                              health_monitor, pool,
                                              service, agent['host'])
 
-    @log.log
+    @log_helpers.log_method_call
     def delete_pool_health_monitor(self, context, health_monitor, pool_id):
         """ Handle LBaaS method by passing to agent """
         # which agent should handle provisioning
@@ -1768,7 +1769,7 @@ class F5PluginDriver(LoadBalancerAbstractDriver):
                                                   pool, service,
                                                   agent['host'])
 
-    @log.log
+    @log_helpers.log_method_call
     def stats(self, context, pool_id):
         """ Handle LBaaS method by passing to agent """
         # which agent should handle provisioning

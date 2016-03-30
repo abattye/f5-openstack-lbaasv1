@@ -27,10 +27,12 @@ except ImportError:
     from oslo_service import loopingcall
     from oslo_service import periodic_task
 
+
+from oslo_log import helpers as log_helpers
 from neutron.agent import rpc as agent_rpc
 from neutron.common import constants as neutron_constants
 from neutron import context
-from neutron.common import log
+
 from neutron.common import topics
 from neutron.common.exceptions import NeutronException
 
@@ -289,7 +291,7 @@ class LbaasAgentManagerBase(periodic_task.PeriodicTasks):
         # needs to be handled by this agent
         self.needs_resync = True
 
-    @log.log
+    @log_helpers.log_method_call
     def _setup_rpc(self):
 
         # LBaaS Callbacks API
@@ -522,7 +524,7 @@ class LbaasAgentManagerBase(periodic_task.PeriodicTasks):
             resync = True
         return resync
 
-    @log.log
+    @log_helpers.log_method_call
     def validate_service(self, pool_id):
         if not self.plugin_rpc:
             return
@@ -549,7 +551,7 @@ class LbaasAgentManagerBase(periodic_task.PeriodicTasks):
                 LOG.exception(_('Unable to validate service for pool: %s' +
                                 str(e.message)), pool_id)
 
-    @log.log
+    @log_helpers.log_method_call
     def refresh_service(self, pool_id):
         if not self.plugin_rpc:
             return
@@ -566,7 +568,7 @@ class LbaasAgentManagerBase(periodic_task.PeriodicTasks):
             LOG.error("Exception: %s" % exc.message)
             self.needs_resync = True
 
-    @log.log
+    @log_helpers.log_method_call
     def destroy_service(self, pool_id):
         if not self.plugin_rpc:
             return
@@ -585,21 +587,21 @@ class LbaasAgentManagerBase(periodic_task.PeriodicTasks):
             self.needs_resync = True
         self.cache.remove_by_pool_id(pool_id)
 
-    @log.log
+    @log_helpers.log_method_call
     def remove_orphans(self, all_pools):
         try:
             self.lbdriver.remove_orphans(all_pools)
         except NotImplementedError:
             pass  # Not all drivers will support this
 
-    @log.log
+    @log_helpers.log_method_call
     def reload_pool(self, context, pool_id=None, host=None):
         """Handle RPC cast from plugin to reload a pool."""
         if host and host == self.agent_host:
             if pool_id:
                 self.refresh_service(pool_id)
 
-    @log.log
+    @log_helpers.log_method_call
     def get_pool_stats(self, context, pool, service):
         LOG.debug("agent_manager got get_pool_stats call")
         if not self.plugin_rpc:
@@ -617,7 +619,7 @@ class LbaasAgentManagerBase(periodic_task.PeriodicTasks):
         except Exception as exc:
             LOG.error("Exception: %s" % exc.message)
 
-    @log.log
+    @log_helpers.log_method_call
     def create_vip(self, context, vip, service):
         """Handle RPC cast from plugin to create_vip"""
         try:
@@ -628,7 +630,7 @@ class LbaasAgentManagerBase(periodic_task.PeriodicTasks):
         except Exception as exc:
             LOG.error("Exception: %s" % exc.message)
 
-    @log.log
+    @log_helpers.log_method_call
     def update_vip(self, context, old_vip, vip, service):
         """Handle RPC cast from plugin to update_vip"""
         try:
@@ -639,7 +641,7 @@ class LbaasAgentManagerBase(periodic_task.PeriodicTasks):
         except Exception as exc:
             LOG.error("Exception: %s" % exc.message)
 
-    @log.log
+    @log_helpers.log_method_call
     def delete_vip(self, context, vip, service):
         """Handle RPC cast from plugin to delete_vip"""
         try:
@@ -650,7 +652,7 @@ class LbaasAgentManagerBase(periodic_task.PeriodicTasks):
         except Exception as exc:
             LOG.error("Exception: %s" % exc.message)
 
-    @log.log
+    @log_helpers.log_method_call
     def create_pool(self, context, pool, service):
         """Handle RPC cast from plugin to create_pool"""
         try:
@@ -661,7 +663,7 @@ class LbaasAgentManagerBase(periodic_task.PeriodicTasks):
         except Exception as exc:
             LOG.error("Exception: %s" % exc.message)
 
-    @log.log
+    @log_helpers.log_method_call
     def update_pool(self, context, old_pool, pool, service):
         """Handle RPC cast from plugin to update_pool"""
         try:
@@ -672,7 +674,7 @@ class LbaasAgentManagerBase(periodic_task.PeriodicTasks):
         except Exception as exc:
             LOG.error("Exception: %s" % exc.message)
 
-    @log.log
+    @log_helpers.log_method_call
     def delete_pool(self, context, pool, service):
         """Handle RPC cast from plugin to delete_pool"""
         try:
@@ -683,7 +685,7 @@ class LbaasAgentManagerBase(periodic_task.PeriodicTasks):
         except Exception as exc:
             LOG.error("delete_pool: Exception: %s" % exc.message)
 
-    @log.log
+    @log_helpers.log_method_call
     def create_member(self, context, member, service):
         """Handle RPC cast from plugin to create_member"""
         try:
@@ -694,7 +696,7 @@ class LbaasAgentManagerBase(periodic_task.PeriodicTasks):
         except Exception as exc:
             LOG.error("create_member: Exception: %s" % exc.message)
 
-    @log.log
+    @log_helpers.log_method_call
     def update_member(self, context, old_member, member, service):
         """Handle RPC cast from plugin to update_member"""
         try:
@@ -705,7 +707,7 @@ class LbaasAgentManagerBase(periodic_task.PeriodicTasks):
         except Exception as exc:
             LOG.error("update_member: Exception: %s" % exc.message)
 
-    @log.log
+    @log_helpers.log_method_call
     def delete_member(self, context, member, service):
         """Handle RPC cast from plugin to delete_member"""
         try:
@@ -716,7 +718,7 @@ class LbaasAgentManagerBase(periodic_task.PeriodicTasks):
         except Exception as exc:
             LOG.error("delete_member: Exception: %s" % exc.message)
 
-    @log.log
+    @log_helpers.log_method_call
     def create_pool_health_monitor(self, context, health_monitor,
                                    pool, service):
         """Handle RPC cast from plugin to create_pool_health_monitor"""
@@ -731,7 +733,7 @@ class LbaasAgentManagerBase(periodic_task.PeriodicTasks):
             LOG.error(_("create_pool_health_monitor: Exception: %s"
                         % exc.message))
 
-    @log.log
+    @log_helpers.log_method_call
     def update_health_monitor(self, context, old_health_monitor,
                               health_monitor, pool, service):
         """Handle RPC cast from plugin to update_health_monitor"""
@@ -745,7 +747,7 @@ class LbaasAgentManagerBase(periodic_task.PeriodicTasks):
         except Exception as exc:
             LOG.error("update_health_monitor: Exception: %s" % exc.message)
 
-    @log.log
+    @log_helpers.log_method_call
     def delete_pool_health_monitor(self, context, health_monitor,
                                    pool, service):
         """Handle RPC cast from plugin to delete_pool_health_monitor"""
@@ -759,7 +761,7 @@ class LbaasAgentManagerBase(periodic_task.PeriodicTasks):
             LOG.error(_("delete_pool_health_monitor: Exception: %s"
                       % exc.message))
 
-    @log.log
+    @log_helpers.log_method_call
     def agent_updated(self, context, payload):
         """Handle the agent_updated notification event."""
         if payload['admin_state_up'] != self.admin_state_up:
@@ -771,7 +773,7 @@ class LbaasAgentManagerBase(periodic_task.PeriodicTasks):
                     self.destroy_service(pool_id)
             LOG.info(_("agent_updated by server side %s!"), payload)
 
-    @log.log
+    @log_helpers.log_method_call
     def tunnel_update(self, context, **kwargs):
         """Handle RPC cast from core to update tunnel definitions"""
         try:
@@ -782,7 +784,7 @@ class LbaasAgentManagerBase(periodic_task.PeriodicTasks):
         except Exception as exc:
             LOG.error("tunnel_update: Exception: %s" % exc.message)
 
-    @log.log
+    @log_helpers.log_method_call
     def add_fdb_entries(self, context, fdb_entries, host=None):
         """Handle RPC cast from core to update tunnel definitions"""
         try:
@@ -794,7 +796,7 @@ class LbaasAgentManagerBase(periodic_task.PeriodicTasks):
         except Exception as exc:
             LOG.error("fdb_add: Exception: %s" % exc.message)
 
-    @log.log
+    @log_helpers.log_method_call
     def remove_fdb_entries(self, context, fdb_entries, host=None):
         """Handle RPC cast from core to update tunnel definitions"""
         try:
@@ -806,7 +808,7 @@ class LbaasAgentManagerBase(periodic_task.PeriodicTasks):
         except Exception as exc:
             LOG.error("remove_fdb_entries: Exception: %s" % exc.message)
 
-    @log.log
+    @log_helpers.log_method_call
     def update_fdb_entries(self, context, fdb_entries, host=None):
         """Handle RPC cast from core to update tunnel definitions"""
         try:
